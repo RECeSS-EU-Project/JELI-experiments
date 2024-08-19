@@ -1,0 +1,4 @@
+jeli==1.0.1
+matplotlib
+scikit-learn
+stanscofi
