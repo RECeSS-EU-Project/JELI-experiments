@@ -188,7 +188,7 @@ def boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type, var="sparsi
 	else:
 		ax.get_legend().remove()
 	plt.gca().spines[['top','right']].set_visible(False)
-	plt.savefig("results_%s_%s_%s.png" % (var, dataset_type, b_type), bbox_inches="tight")
+	plt.savefig("results_%s_%s_%s_%d.png" % (var, dataset_type, b_type, im), bbox_inches="tight")
 	plt.close()
 	
 def result_sparsity(R, baselines, dataset_type, b_type):
