@@ -16,7 +16,7 @@ cuda_on=(torch._C._cuda_getDeviceCount()>0)
 random_seed = 1234
 folder, kge_folder = "./results/", "files/"
 fsize=25
-runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment"]
+runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact"]
 
 ##################################################
 ## Interpretability (synthetic datasets)        ##
@@ -149,7 +149,8 @@ def boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type, var="sparsi
 		"FM2":"teal", "CrossFM2":"mediumseagreen", "SELT_pca_f": "deepskyblue", "SELT_pca_iu": "steelblue", "SELT_kge":"indigo", 
 		"None": "steelblue", "STRING": "goldenrod",
 		"PrimeKG": "lightcoral", "Hetionet": "deepskyblue", "DRKG": "mediumseagreen", "PharmKG8k": "teal", "PharmKG": "cyan"}
-	m_name = {0:"AUC", 1:"NDCG", 2:"NS-AUC", 3:"Metric"}[im]
+	#m_name = {0:"AUC", 1:"NDCG", 2:"NS-AUC", 3:"Metric"}[im]
+	m_name = {0:"AUC", 1:"NDCG", 2:"NS-AUC", 3:"Inference time", 4: "Training time"}[im]
 	dfs.columns = [{var: var_name, "value" : m_name, "variable": "Algorithm"}[c] for c in dfs.columns]
 	algo_renames = {
 		"FastaiCollabWrapper": "Fast.ai", "SELT_pca_f": "SELT (PCAf)", 
@@ -165,7 +166,10 @@ def boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type, var="sparsi
 		for k in di:
 			col[col==k] = di[k]
 		dfs["Validation metric"] = col
-	sns.boxplot(dfs, x=var_name, y=m_name, hue="Algorithm", ax=ax, palette=pal)
+	if (b_type != "ablationstudy"):
+		sns.boxplot(dfs, x=var_name, y=m_name, hue="Algorithm", ax=ax, palette=pal)
+	else:
+		sns.boxplot(dfs, y=var_name, x=m_name, hue="Algorithm", orient="h", ax=ax, palette=pal)
 	if (len(dfs["Algorithm"].unique()) in [2, 5]):
 		for im, m in enumerate(dfs[var_name].unique()):
 			aa_lst = {a: dfs[dfs.columns[0]][(dfs[var_name]==m)&(dfs['Algorithm'] == a)] for a in dfs["Algorithm"].unique()}
@@ -177,16 +181,28 @@ def boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type, var="sparsi
 					dec = str(res.pvalue)[-2:]
 					ax.text(im-0.25, 1.03*mx, ("*"+"**"*int(res.pvalue<0.01))+"    "+(r"p=$10^{-%s}$" % dec), c=pal[a1], fontsize=fsize)
 					ax.plot([im-0.5,im+0.5], [mx]*2, c=pal[a1])
-	ax.set_xticklabels(ax.get_xticklabels(), rotation=27, fontsize=fsize)
-	if (ylim is not None):
-		ax.set_ylim(ylim)
-	ax.set_yticklabels(ax.get_yticklabels(), fontsize=fsize)
-	ax.set_ylabel(r"%s (N=%d iter)" % (m_name, ndata*niter), fontsize=fsize)
-	ax.set_xlabel(var_name, fontsize=fsize)
-	if (not no_legend):
-		ax.legend(fontsize=fsize, loc='center left', bbox_to_anchor=(1, 0.5))
+	if (b_type != "ablationstudy"):
+		ax.set_xticklabels(ax.get_xticklabels(), rotation=27, fontsize=fsize)
+		if (ylim is not None):
+			ax.set_ylim(ylim)
+		ax.set_yticklabels(ax.get_yticklabels(), fontsize=fsize)
+		ax.set_ylabel(r"%s (N=%d iter)" % (m_name, ndata*niter), fontsize=fsize)
+		ax.set_xlabel(var_name, fontsize=fsize)
+		if (not no_legend):
+			ax.legend(fontsize=fsize, loc='center left', bbox_to_anchor=(1, 0.5))
+		else:
+			ax.get_legend().remove()
 	else:
-		ax.get_legend().remove()
+		ax.set_xticklabels(ax.get_xticklabels(), rotation=27, fontsize=fsize)
+		if (ylim is not None):
+			ax.set_ylim(ylim)
+		ax.set_yticklabels(ax.get_yticklabels(), fontsize=fsize)
+		ax.set_ylabel(r"%s (N=%d iter)" % (m_name, ndata*niter), fontsize=fsize)
+		ax.set_xlabel(var_name, fontsize=fsize)
+		if (not no_legend):
+			ax.legend(fontsize=fsize, loc='center left', bbox_to_anchor=(1, 0.5))
+		else:
+			ax.get_legend().remove()
 	plt.gca().spines[['top','right']].set_visible(False)
 	plt.savefig("results_%s_%s_%s_%d.png" % (var, dataset_type, b_type, im), bbox_inches="tight")
 	plt.close()
@@ -317,7 +333,7 @@ if ("drug_repurposing" in runtests):
 			di.update({{"PREDICT_Gottlieb": "PREDICT-G"}.get(dataset_name, dataset_name) : metrics_df.get(a)["auc"]})
 			metrics_df_.update({a: di})
 	if (plot_it):
-		boxplot_metric(0, metrics_df_, 1, niter, fsize, "compare", "", var="metric", var_name="Data set", ylim=(0.78, 1))
+		boxplot_metric(0, metrics_df_, 1, niter, fsize, "compare", "", var="metric", var_name="Data set", ylim=(0.850,0.975))
 		
 ##################################################
 ## Parameter impact (dimension) on deviated     ##
@@ -401,6 +417,87 @@ for ii in ["", "2"]:
 				continue
 			print("* %s" % dataset_name)
 			result_parameter(results_parameter[dataset_name], ["JELI"], dataset_name, f"parameter-impact{ii}") 
+			
+##################################################
+## Parameter impact (order) on deviated         ##
+##################################################
+print("------------------- Effect of the order (deviated dataset)")
+
+def result_parameter(R, baselines, dataset_type, b_type):
+	if (R is None):
+		return None
+	## Different datasets
+	ndata = len(R)
+	metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime = [{b: {} for b in baselines} for i in range(5)]
+	for data_seed in R:
+		iter_parameter = []
+		auc_mean = None
+		## Different dimensions numbers
+		for order in R[data_seed]:
+			iter_mat = None
+			metrics = None
+			models = None
+			## Different trainings
+			niter = len(R[data_seed][order])
+			for si, iter_seed in enumerate(R[data_seed][order]):
+				res = R[data_seed][order][iter_seed]
+				mat = pd.DataFrame(res).values
+				if (iter_mat is None):
+					d1, d2 = mat.shape 
+					iter_mat = np.empty((d1, d2, niter))
+					models = pd.DataFrame(res).columns
+					metrics = pd.DataFrame(res).index
+					if (auc_mean is None):
+						auc_mean = np.zeros(len(models))
+				iter_mat[:,:,si] = mat
+			for ia, metrics_m in enumerate([metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime]):
+				for ic, col in enumerate(models):
+					if (col in baselines):
+						di = metrics_m[col]
+						auc_col_ndim = di.get(order,[])+iter_mat[ia,ic,:].tolist()
+						di.update({order: auc_col_ndim})
+						metrics_m.update({col: di})
+			mean_mat, std_mat = iter_mat.mean(axis=2), iter_mat.std(axis=2)
+			mat = np.vectorize(lambda x : x + " +-")(mean_mat.round(3).astype(str))
+			mat = np.vectorize(lambda x,y : x + y)(mat, std_mat.round(4).astype(str))
+			auc_mean += mean_mat[0,:]
+			iter_parameter.append((order, iter_mat))
+
+	for i in ["aucs", "nsauc", "ndcg", "testtime", "traintime"]:
+		X = pd.DataFrame(eval("metrics_"+i))
+		for k in X.index:
+			for j in X.columns:
+				pass
+
+	if (plot_it):	
+		for im, m in enumerate([metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime]):
+			boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type+"-"+["AUC","NDCG",'NSAUC','testtime', 'traintime'][im], var="order", var_name="RHOFM order", no_legend=True)
+	print("")
+
+if (not os.path.exists("%s/results_order.pck" % (folder))):
+	fnames = glob("%s/results_order_*.pck" % (folder))
+	fnames = [fname for fname in fnames if (len(fname.split("_"))==4)]
+	dataset_names = list(set([fname.split("_")[2] for fname in fnames]))
+	results_parameter = {}
+	for dataset_name in dataset_names:
+		results_iter = {}
+		fnames = glob("%s/results_order_%s_*.pck" % (folder, dataset_name))
+		fnames = [fname for fname in fnames if (len(fname.split("_"))==4)]
+		for fname in fnames:
+			seed = int(fname.split("_")[-1].split(".pck")[0])
+			with open(fname, "rb") as f:
+				results_iter.setdefault(seed, pickle.load(f))
+		results_parameter.setdefault(dataset_name, results_iter)
+else:
+	with open("%s/results_order.pck" % (folder), "rb") as f:
+		results_parameter = pickle.load(f)
+	
+if ("order_impact" in runtests):
+	for dataset_name in results_parameter:
+		if (dataset_name in ["synthetic"]):
+			continue
+		print("* %s" % dataset_name)
+		result_parameter(results_parameter[dataset_name], ["JELI"], dataset_name, "order-impact") 
 
 ##################################################
 ## Graph-Based Prior (TRANSCRIPT dataset)       ##
