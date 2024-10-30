@@ -1,0 +1,45 @@
+drug identifier,drug score,drug name,drug family (DrugBank),ATC classification (PubChem),mechanism of action (DrugBank),current therapeutic indications (Drugbank),#PubMed studies (2019-24)
+DB00928,0.926713,Azacitidine,pyrimidine nucleoside analogue,L01BC07,It induces antineoplastic activity by inhibiting DNA methyltransferase at low doses and inducing cytotoxicity by incorporating itself into RNA and DNA at high doses.,"acute myeloid leukemia, refractory anemia, chronic myelomonocytic leukemia",4
+DB00331,0.926303,Metformin,biguanide antihyperglycemic,A10BA02,"Metformin reduces hepatic production of glucose, decreases the intestinal absorption of glucose, and enhances insulin sensitivity by increasing both peripheral glucose uptake and utilization.","used in combination for type 2 diabetes mellitus, insulin resistance",9
+DB01067,0.924468,Glipizide,sulfonylurea medication,A10BB07,to sensitize pancreatic beta cells and stimulate insulin release.,type 2 diabetes mellitus,0
+DB00685,0.924225,Trovafloxacin,antibiotic,PFAS -> ATC classified fluorinated pharmaceutical,It exerts its antibacterial activity by inhibiting the uncoiling of supercoiled DNA in various bacteria by blocking the activity of DNA gyrase and topoisomerase IV. ,gonorrhea and chlamydia.,0
+DB01197,0.924219,Captopril,ACE inhibitor,C09AA01,"Captopril, an ACE inhibitor, antagonizes the effect of the RAAS.","management of essential or renovascular hypertension, congestive heart failure, left ventricular dysfunction following myocardial infarction, and nephropathy.",0
+DB00983,0.924105,Formoterol,long-acting beta2-adrenergic receptor agonist ,R03CC15,"It acts on bronchial smooth muscle to dilate and relax airways, and is administered as a racemic mixture of its active (R;R)- and inactive (S;S)-enantiomers",bronchodilator in the management of asthma and COPD,0
+DB00526,0.921138,Oxaliplatin,platinum based chemotherapy agent,L01XA03,"oxaliplatin's mechanism of action is primarily through DNA damage through DNA crosslinking, particularly intrastrand and interstrand crosslinking",carcinoma of the colon or rectum or stage III colon cancer.,2
+DB01064,0.920084,Isoprenaline,catecholamine non-selective beta-adrenergic agonist,C01CA02,"this isopropyl analog of epinephrine dilated the bronchi, as well as raising the heart rate and cardiac output, without vasoconstriction",bradycardia and heart block,1
+,,,,,,,
+Sources,,,,,,,
+https://go.drugbank.com/ Accessed on 10/30/2024,,,,,,,
+https://pubchem.ncbi.nlm.nih.gov/ Accessed on 10/30/2024,,,,,,,
+https://pubmed.ncbi.nlm.nih.gov/ Accessed on 10/30/2024,,,,,,,
+"PubMed query: ""<drug name>"" AND ""Melanoma""",,,,,,,
+Example https://pubmed.ncbi.nlm.nih.gov/?term=%22Metformin%22+AND+%22Melanoma%22&filter=years.2019-2024 ,,,,,,,
+https://www.ncbi.nlm.nih.gov/geo/ Accessed on 10/30/2024,,,,,,,
+,,,,,,,
+Azacitidine,,,,,,,
+PubMed ID,DOI,Description,Number of patients / samples,Conclusions,Year / Latest reported impact factor,,
+36923309,10.1158/2767-9764.CRC-22-0128,early phase II study of azacitidine and carboplatin priming for anti-PDL1 immunotherapy (avelumab) in patients with advanced ICB-resistant melanoma,20 participants with ICB-resistant metastatic melanoma,Priming with azacitidine and carboplatin can induce disease stabilization and resensitization to ICB for metastatic melanoma.,2022 / 2.0,,
+34866327,10.1002/pbc.29468 ,experimental therapy with the DNA methyltransferase inhibitor azacitidine in combination with the mitogen-activated protein kinase (MEK) inhibitor trametinib,a 2.7-year-old male with CMN syndrome (risk factor for melanoma),Response to combination therapy appeared to be more durable than the treatment response observed in several other severely affected patients treated with trametinib for late-stage disease.,2022 / 3.838,,
+34451846,10.3390/ph14080749,"We evaluated the efficacy of various combinations of BH3 mimetic + azacitidine in fourteen human melanoma cell lines from cutaneous, mucosal, acral and uveal subtypes.",human cell lines,"we found that combining inhibition of MCL1, an anti-apoptotic BCL2 protein, with azacitidine had substantial pro-apoptotic effects in multiple melanoma cell lines.",2021 / 5.215,,
+39252522,10.1002/pbc.31316,NRAS melanoma response to trametinib and azacitidine ,,,2024 / 3.838,,
+,,,,,,,
+Metformin,(considered only the first page in PubMed),,,,,,
+PubMed ID,DOI,Description,Number of patients / samples,Conclusions,Year / Latest reported impact factor,,
+32425881,10.3389/fendo.2020.00191,Meta-analysis,None,Metformin can induce cell cycle arrest in the G0–G1 phase in melanoma cells. metformin can attenuate melanoma growth and metastasis through inhibiting the expression of TRB3 (tribbles pseudokinase 3) in non-diabetic and diabetic mouse models,2020 / 6.055,,
+35834898,10.1016/j.jinorgbio.2022.111915 ,we compare the effects of decavanadate and metformin-decavanadate on Ca2+-ATPase activity in sarcoplasmic reticulum vesicles from rabbit skeletal muscles and on cell signaling events and viability in human melanoma cells.,human cell lines,Both decavanadate and metformin-decavanadate exert antiproliferative effects on melanoma cells at 10 times lower concentrations than monomeric vanadate.,2022 / 3.8,,
+33749049,10.1002/onco.13761,"57 patients with disseminated melanoma received dacarbazine (DTIC) 1,000 mg/m2 on day 1 of a 28-day cycle, either as monotherapy (first group) or in combination with melatonin 3 mg p.o. daily (second group) or metformin 850 mg two times a day p.o. daily (third group) as the first-line of chemotherapy. ",57 patients with disseminated melanoma,Metformin did not increase the efficacy of systemic chemotherapy in melanoma. ,2021 / 4.8,,
+38846983,10.3389/fonc.2024.1399693,Meta-analysis,None,"we could not demonstrate a specific improvement in the survival of melanoma patients, the combined benefits and safety of metformin for patients taking the drug are worthy of recognition. ",2024 / 6.2,,
+34506671,10.1002/cbin.11700,"To induce resistance to DTIC, murine melanoma cells were exposed to increasing concentrations of dacarabazine (DTIC-res group). Metformin was administered before and during the induction of resistance to DTIC (MET-DTIC).",Mouse cell lines,"In presence of metformin in the resistant induction process to DTIC, (MET-DTIC) cells had increased antioxidant thiols, MDA, nuclear p53, 8-OH-DG, Nrf2, and reducing NF-ĸB, weakening the DTIC-resistant phenotype. The exclusive administration of metformin (MET group) also induced the cellular resistance to DTIC. ",2022 / 3.612,,
+36689497,10.1093/bjd/ljac003,Observational study on metformin uses,1162 patients with CM and type 2 diabetes mellitus,"Metformin use was associated with improved OS in patients with CM and diabetes regardless of timing (pre-, post- or peridiagnostic use) and followed a dose-response pattern.",2023 / 11.11,,
+36474458,10.1515/jbcpp-2022-0252,Meta-analysis,,,2022 / 0.617,,
+37277264,10.1016/j.ejca.2023.04.016 ,"Patients with resected high-risk stage IIIA, IIIB, or IIIC melanoma received 200 mg of pembrolizumab (n = 514) or placebo (n = 505) every 3 weeks for twelve months  Fifty-four patients (0.5%) used metformin at baseline.",54 patients,There was no significant impact of metformin use on pembrolizumab efficacy in resected high-risk stage III melanoma.,2023 / 7.6,,
+PMC7996084,10.1080/10717544.2021.1898703,co-delivered a combination of MET and DOX into melanoma tumors,mice,"trigger pyroptosis, apoptosis, and necroptosis (PANoptosis) of the melanoma cells, thus blocking melanoma progression",2021 / 6.0,,
+,,,,,,,
+Oxaliplatin,,,,,,,
+PubMed ID,DOI,Description,Number of patients / samples,Conclusions,Year / Latest reported impact factor,,
+33924827,10.3390/ijms22094618,treatment of malignant melanoma cell lines with oxaliplatin ,cell lines,XIST knockdown inhibited proliferation and migration in MM cells and increased the oxaliplatin sensitivity of oxaliplatin-resistant MM cells.,2019 / 1.5,,
+39276890,10.1016/j.ijbiomac.2024.135542,"a small amount of oxaliplatin (OXA), an ICD inducer, is encapsulated within M1LMHA (injectable M1 macrophage lysate and Alg-based macroporous hydrogels)",murine melanoma B16F10 cell lines,"M1LMHA encapsulating OXA for the innovative approach towards antitumor immunotherapy, aiming at halting the growth, recurrence, and metastasis of melanoma. ",2024 / 13.7,,
+,,,,,,,
+Isoprenaline,,,,,,,
+PubMed ID,DOI,Description,Number of patients / samples,Conclusions,Year / Latest reported impact factor,,
+34766341,10.1111/bph.15731,"synthetic catecholamine isoprenaline, which selectively stimulates β-Ars (AR: adrenoceptor )",B16F10 melanoma-bearing mice,"treatment with the α- and β-AR agonist adrenaline or with the synthetic catecholamine isoprenaline, which selectively stimulates β-ARs, did not affect melanoma growth.",2022 / 6.8,,
