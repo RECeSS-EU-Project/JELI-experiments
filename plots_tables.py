@@ -23,16 +23,6 @@ runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter
 ##################################################
 print("------------------- Interpretability (synthetic datasets)")
 
-if (not os.path.exists("%s/results_interpretable.pck")):
-	fnames = ["%s/results_interpretable_%s.pck" % (folder, dtype) for dtype in ["interpretable","deviated"]]
-	results_interpretable = {}
-	for fname in fnames:
-		with open(fname, "rb") as f:
-			results_interpretable.setdefault(fname.split(".pck")[0].split("_")[-1], pickle.load(f))
-else:
-	with open("%s/results_interpretable.pck" % folder, "rb") as f:
-		results_interpretable = pickle.load(f)
-
 def result_interpretable(R, dataset_type=""):
 	if (R is None):
 		return None
@@ -105,6 +95,16 @@ def result_interpretable(R, dataset_type=""):
 		plt.close()
 
 if ("interpretable" in runtests):
+	if (not os.path.exists("%s/results_interpretable.pck")):
+		fnames = ["%s/results_interpretable_%s.pck" % (folder, dtype) for dtype in ["interpretable","deviated"]]
+		results_interpretable = {}
+		for fname in fnames:
+			with open(fname, "rb") as f:
+				results_interpretable.setdefault(fname.split(".pck")[0].split("_")[-1], pickle.load(f))
+	else:
+		with open("%s/results_interpretable.pck" % folder, "rb") as f:
+			results_interpretable = pickle.load(f)
+		
 	for dataset_type in results_interpretable:
 		print("* %s" % dataset_type)
 		result_interpretable(results_interpretable[dataset_type], dataset_type)
