@@ -16,7 +16,7 @@ cuda_on=(torch._C._cuda_getDeviceCount()>0)
 random_seed = 1234
 folder, kge_folder = "./results/", "files/"
 fsize=25
-runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact"]
+runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact","movielens"]
 
 ##################################################
 ## Interpretability (synthetic datasets)        ##
@@ -334,6 +334,72 @@ if ("drug_repurposing" in runtests):
 			metrics_df_.update({a: di})
 	if (plot_it):
 		boxplot_metric(0, metrics_df_, 1, niter, fsize, "compare", "", var="metric", var_name="Data set", ylim=(0.850,0.975))
+		
+##################################################
+## Performance (MovieLens dataset)              ##
+##################################################
+print("------------------- Recommendation (MovieLens dataset)")
+
+if (not os.path.exists("%s/results_movielens.pck" % folder)):
+	fnames = glob("%s/results_movielens-*.pck" % folder)
+	results_movielens = {}
+	for fname in fnames:
+		with open(fname, "rb") as f:
+			results_movielens.setdefault(fname.split(".pck")[0].split("-")[-1], pickle.load(f))
+else:
+	with open("%s/results_movielens.pck" % folder, "rb") as f:
+		results_movielens = pickle.load(f)
+	
+def result_movielens(R, baselines, dataset_type):
+	if (R is None):
+		return None
+	## Different trainings
+	iter_mat = None
+	metrics = None
+	models = None
+	niter = len(R)
+	metrics_df = {b: {} for b in baselines}
+	for si, iter_seed in enumerate(R):
+		res = R[iter_seed]
+		mat = pd.DataFrame(res).values
+		if (iter_mat is None):
+			d1, d2 = mat.shape 
+			iter_mat = np.empty((d1, d2, niter))
+			models = pd.DataFrame(res).columns
+			metrics = pd.DataFrame(res).index
+			auc_mean = np.zeros(len(models))
+		iter_mat[:,:,si] = mat
+	for ic, col in enumerate(models):
+		if (col in baselines):
+			di = metrics_df[col]
+			for im, m in enumerate(["auc"]):
+				im = 0
+				auc_col_metric = di.get(m,[])+iter_mat[im,ic,:].tolist()
+				di.update({m: auc_col_metric})
+			metrics_df.update({col: di})
+	mean_mat, std_mat = iter_mat.mean(axis=2), iter_mat.std(axis=2)
+	mat = np.vectorize(lambda x : x + " +-")(mean_mat.round(3).astype(str))
+	mat = np.vectorize(lambda x,y : x + y)(mat, std_mat.round(4).astype(str))
+	print(pd.DataFrame(mat, index=metrics, columns=models))
+
+	print(pd.DataFrame(np.round(mean_mat[0,:].reshape(1,-1),3), index=["avg. auc"], columns=models).T.sort_values(by="avg. auc", ascending=False).T)
+	print("")
+	
+	return metrics_df, niter
+	if (plot_it):
+		boxplot_metric(0, metrics_df, 1, niter, fsize, dataset_type, "", var="metric", var_name="Validation metric")
+	
+if ("movielens" in runtests):
+	metrics_df_ = {b: {} for b in ["JELI","HAN","FastaiCollabWrapper","NIMCGCN"]}
+	for dataset_name in results_movielens:
+		print("* %s" % dataset_name)
+		metrics_df, niter = result_movielens(results_movielens[dataset_name], ["JELI","HAN","FastaiCollabWrapper","NIMCGCN"], dataset_name)
+		for a in metrics_df_:
+			di = metrics_df_.get(a, {})
+			di.update({{"PREDICT_Gottlieb": "PREDICT-G"}.get(dataset_name, dataset_name) : metrics_df.get(a)["auc"]})
+			metrics_df_.update({a: di})
+	if (plot_it):
+		boxplot_metric(0, metrics_df_, 1, niter, fsize, "movielens", "", var="metric", var_name="Data set")
 		
 ##################################################
 ## Parameter impact (dimension) on deviated     ##
