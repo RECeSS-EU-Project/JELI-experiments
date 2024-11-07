@@ -493,6 +493,8 @@ def result_parameter(R, baselines, dataset_type, b_type):
 	if (R is None):
 		return None
 	## Different datasets
+	ndatain = np.max([len(R[r]) for r in R])
+	R = {r: R[r] for r in R if (len(R[r])==ndatain)} ## only full runs
 	ndata = len(R)
 	metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime = [{b: {} for b in baselines} for i in range(5)]
 	for data_seed in R:
