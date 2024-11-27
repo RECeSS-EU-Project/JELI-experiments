@@ -16,7 +16,8 @@ cuda_on=(torch._C._cuda_getDeviceCount()>0)
 random_seed = 1234
 folder, kge_folder = "./results/", "files/"
 fsize=25
-runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact","movielens"]
+runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact","movielens","scalability"]
+runtests = ["order_impact", "scalability"]
 
 ##################################################
 ## Interpretability (synthetic datasets)        ##
@@ -489,7 +490,7 @@ for ii in ["", "2"]:
 ##################################################
 print("------------------- Effect of the order (deviated dataset)")
 
-def result_parameter(R, baselines, dataset_type, b_type):
+def result_parameter_order(R, baselines, dataset_type, b_type):
 	if (R is None):
 		return None
 	## Different datasets
@@ -565,7 +566,97 @@ if ("order_impact" in runtests):
 		if (dataset_name in ["synthetic"]):
 			continue
 		print("* %s" % dataset_name)
-		result_parameter(results_parameter[dataset_name], ["JELI"], dataset_name, "order-impact") 
+		result_parameter_order(results_parameter[dataset_name], ["JELI"], dataset_name, "order-impact") 
+		
+##################################################
+## Parameter other impact on deviated           ##
+##################################################
+print("------------------- Effect of other parameters (deviated dataset)")
+
+def result_scalability(R, baselines, dataset_type, b_type):
+	if (R is None):
+		return None
+	## Different datasets
+	#ndatain = np.max([len(R[r]) for r in R])
+	#R = {r: R[r] for r in R if (len(R[r])==ndatain)} ## only full runs
+	for param in R:
+		#print(param)
+		metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime = [{b: {} for b in baselines} for i in range(5)]
+		ndata = len(R[param])
+		for data_seed in R[param]:
+			iter_parameter = []
+			auc_mean = None
+			for value in R[param][data_seed]:
+				iter_mat = None
+				metrics = None
+				models = None
+				## Different trainings
+				niter = len(R[param][data_seed][value])
+				for si, iter_seed in enumerate(R[param][data_seed][value]):
+					res = R[param][data_seed][value][iter_seed]
+					mat = pd.DataFrame(res).values
+					if (iter_mat is None):
+						d1, d2 = mat.shape 
+						iter_mat = np.empty((d1, d2, niter))
+						models = pd.DataFrame(res).columns
+						metrics = pd.DataFrame(res).index
+						if (auc_mean is None):
+							auc_mean = np.zeros(len(models))
+					iter_mat[:,:,si] = mat
+				for ia, metrics_m in enumerate([metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime]):
+					for ic, col in enumerate(models):
+						if (col in baselines):
+							di = metrics_m[col]
+							auc_col_ndim = di.get(value,[])+iter_mat[ia,ic,:].tolist()
+							di.update({value: auc_col_ndim})
+							metrics_m.update({col: di})
+				mean_mat, std_mat = iter_mat.mean(axis=2), iter_mat.std(axis=2)
+				mat = np.vectorize(lambda x : x + " +-")(mean_mat.round(3).astype(str))
+				mat = np.vectorize(lambda x,y : x + y)(mat, std_mat.round(4).astype(str))
+				auc_mean += mean_mat[0,:]
+				iter_parameter.append((value, iter_mat))
+
+		for i in ["aucs", "nsauc", "ndcg", "testtime", "traintime"]:
+			X = pd.DataFrame(eval("metrics_"+i))
+			for k in X.index:
+				for j in X.columns:
+					pass
+
+		if (plot_it):	
+			for im, m in enumerate([metrics_aucs, metrics_ndcg, metrics_nsauc, metrics_testtime, metrics_traintime]):
+				metrics_list = ["AUC","NDCG",'NSAUC','testtime', 'traintime']
+				boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type+"-"+param+"-"+metrics_list[im], var=param, var_name={"npoints": r"$n_i \times n_u$", "ndim": "d", "nfeatures": "F", "thres": r"$\tau$"}.get(param), no_legend=True)
+		print("")
+
+if (not os.path.exists("%s/results_scalability.pck" % (folder))):
+	fnames = glob("%s/results_scalability_*.pck" % (folder))
+	fnames = [fname for fname in fnames if (len(fname.split("_"))>=5)]
+	dataset_names = list(set([fname.split("_")[2] for fname in fnames]))
+	results_parameter = {}
+	for dataset_name in dataset_names:
+		results_iter = {}
+		fnames = glob("%s/results_scalability_%s_*.pck" % (folder, dataset_name))
+		fnames = [fname for fname in fnames if ((len(fname.split("_"))==5) or (len(fname.split("_"))==6 and "sim_thres" in fname))]
+		for fname in fnames:
+			seed = int(fname.split("_")[3].split(".pck")[0])
+			param, value = tuple(fname.split(".pck")[0].split("_")[-1].split("="))
+			with open(fname, "rb") as f:
+				di = results_iter.get(param, {})
+				ddi = di.get(seed, {})
+				ddi.update({float(value): pickle.load(f)})
+				di.update({seed: ddi})
+				results_iter.update({param : di})
+		results_parameter.setdefault(dataset_name, results_iter)
+else:
+	with open("%s/results_scalability.pck" % (folder), "rb") as f:
+		results_parameter = pickle.load(f)
+	
+if ("scalability" in runtests):
+	for dataset_name in results_parameter:
+		if (dataset_name in ["synthetic"]):
+			continue
+		print("* %s" % dataset_name)
+		result_scalability(results_parameter[dataset_name], ["JELI"], dataset_name, "scalability") 
 
 ##################################################
 ## Graph-Based Prior (TRANSCRIPT dataset)       ##
