@@ -17,7 +17,6 @@ random_seed = 1234
 folder, kge_folder = "./results/", "files/"
 fsize=25
 runtests = ["interpretable","sparsity","drug_repurposing","add_prior","parameter_impact","gene_enrichment","order_impact","movielens","scalability"]
-runtests = ["order_impact", "scalability"]
 
 ##################################################
 ## Interpretability (synthetic datasets)        ##
