@@ -617,6 +617,7 @@ def result_scalability(R, baselines, dataset_type, b_type):
 
 		for i in ["aucs", "nsauc", "ndcg", "testtime", "traintime"]:
 			X = pd.DataFrame(eval("metrics_"+i))
+			print([(i, param, k2,np.mean(X[k1].loc[k2])) for k1 in X.columns for k2 in X.index])
 			for k in X.index:
 				for j in X.columns:
 					pass
