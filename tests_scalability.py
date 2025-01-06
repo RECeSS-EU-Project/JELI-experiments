@@ -84,7 +84,7 @@ if __name__ == "__main__":
 	np.random.seed(random_seed)
 	random.seed(random_seed)
 	
-	Ndata=20 #100      ## iterate over several randomly generated instances
+	Ndata=100      ## iterate over several randomly generated instances
 	Niter=1    ## iterate over several random seeds for the same instance
 	dataset_types = ["deviated"]
 	dataset_params = {}

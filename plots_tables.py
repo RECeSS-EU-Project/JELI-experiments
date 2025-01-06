@@ -197,8 +197,8 @@ def boxplot_metric(im, m, ndata, niter, fsize, dataset_type, b_type, var="sparsi
 		if (ylim is not None):
 			ax.set_ylim(ylim)
 		ax.set_yticklabels(ax.get_yticklabels(), fontsize=fsize)
-		ax.set_ylabel(r"%s (N=%d iter)" % (m_name, ndata*niter), fontsize=fsize)
-		ax.set_xlabel(var_name, fontsize=fsize)
+		ax.set_xlabel(r"%s (N=%d iter)" % (m_name, ndata*niter), fontsize=fsize)
+		ax.set_ylabel(var_name, fontsize=fsize)
 		if (not no_legend):
 			ax.legend(fontsize=fsize, loc='center left', bbox_to_anchor=(1, 0.5))
 		else:
