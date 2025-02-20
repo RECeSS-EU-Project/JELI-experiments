@@ -42,9 +42,15 @@ At the end of all runs, execute *plots_tables.py* to generate tables and figures
 ## 4. Citation
 
 ```bash
-@article{reda2024joint,
-  title={Joint Embedding-Classifier Learning for Interpretable Collaborative Filtering},
+@article{reda2025joint,
+  title={Joint embedding--classifier learning for interpretable collaborative filtering},
   author={R{\'e}da, Cl{\'e}mence and Vie, Jill-J{\^e}nn and Wolkenhauer, Olaf},
-  year={2024}
+  journal={BMC bioinformatics},
+  volume={26},
+  number={1},
+  pages={26},
+  year={2025},
+  publisher={Springer}
 }
+
 ```
